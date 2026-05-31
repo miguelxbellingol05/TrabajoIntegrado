@@ -1,0 +1,17 @@
+{% extends "reciclaje/vistadm.html" %}
+
+{% block content %}
+<center>
+    <h2>Crear cuenta</h2>
+</center>
+<div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+    <form method="POST">
+        {% csrf_token %}
+        {% load crispy_forms_tags %}
+        {{form | crispy}}
+        <center>
+            <button type="submit" class="btn btn-success">Crear cuenta</button>
+        </center>
+    </form>
+</div>
+{% endblock content %}

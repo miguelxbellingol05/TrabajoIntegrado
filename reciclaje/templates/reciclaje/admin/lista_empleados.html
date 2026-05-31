@@ -1,0 +1,35 @@
+{% extends "reciclaje/vistadm.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Listado de Usuarios</h2>
+    
+    <div class="table-responsive" style="max-width: 600px;"> <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>RUT (Toca para ver detalles)</th>
+                    <th>Nombre Completo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in listado %}
+                <tr>
+                    <td>
+                        <a href="{% url 'detalle_empleados' usuario.pk %}" class="text-decoration-none fw-bold text-primary">
+                            {{ usuario.rut }}
+                        </a>
+                    </td>
+                    <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No hay usuarios registrados.</td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+
+        </table>
+    </div>
+</div>
+{% endblock content %}
