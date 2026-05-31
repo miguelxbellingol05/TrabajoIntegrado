@@ -1,0 +1,63 @@
+{% extends "reciclaje/base_general.html" %}
+
+{% block title %}Boleta Vendedor - Lormetal{% endblock %}
+
+{% block base_content %}
+<div class="container my-5">
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white text-center">
+            <h3 class="mb-0">Boleta de Compra</h3>
+            <small>Lormetal Reciclaje</small>
+        </div>
+
+        <div class="card-body">
+            <h5>Datos de la compra</h5>
+
+            <p><strong>N° Compra:</strong> {{ compra.id_compra }}</p>
+            <p><strong>Proveedor:</strong> {{ compra.id_proveedor.nombre }} {{ compra.id_proveedor.apellido }}</p>
+            <p><strong>Vendedor:</strong> {{ compra.id_usuario.nombre }} {{ compra.id_usuario.apellido }}</p>
+            <p><strong>Fecha:</strong> {{ compra.fecha_hora|date:"d/m/Y H:i" }}</p>
+            <p><strong>Estado:</strong> {{ compra.estado }}</p>
+
+            <hr>
+
+            <h5>Metales registrados</h5>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Metal</th>
+                            <th>Peso kg</th>
+                            <th>Precio unitario</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in detalles %}
+                            <tr>
+                                <td>{{ detalle.metal_nombre }}</td>
+                                <td>{{ detalle.peso_kg }}</td>
+                                <td>{{ detalle.precio_unitario }}</td>
+                                <td>{{ detalle.subtotal }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    No hay metales registrados en esta compra.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'vstavnde' %}" class="btn btn-success">
+                    Volver al menú de venta
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

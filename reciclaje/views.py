@@ -161,7 +161,8 @@ def nueva_compra(request):
                 try:
                     lista_metales = json.loads(metales_json)
                     for item in lista_metales:
-                        peso = float(item.get('peso', 0))
+                        nombre_metal = item.get('metal')
+                        peso = Decimal(str(item.get('peso', 0)))
                         
                         DetalleCompra.objects.create(
                             id_compra=nueva_compra_obj,
@@ -170,12 +171,28 @@ def nueva_compra(request):
                             precio_unitario=0.00,
                             subtotal=0.00
                         )
+
+                        tipo_metal = TipoMetal.objects.filter(nombre=nombre_metal).first()
+
+                        if tipo_metal:
+                            inventario, creado = Inventario.objects.get_or_create(
+                                id_metal = tipo_metal,
+                                defaults={
+                                    'stock_actual_kg': 0,
+                                    'id_usuario_responsable': usuario_vendedor
+                                }
+                            )
+
+                            inventario.stock_actual_kg = inventario.stock_actual_kg + peso
+                            inventario.id_usuario_responsable = usuario_vendedor
+                            inventario.save()
+
                 except (json.JSONDecodeError, ValueError) as e:
                     print(f"Error procesando JSON de metales: {e}")
 
             messages.success(request, "¡Compra guardada con éxito en el servidor!")
 
-            return redirect('ver_boleta', id_compra=nueva_compra_obj.id_compra)
+            return redirect('boleta_vendedor', id_compra=nueva_compra_obj.id_compra)
         
         else:
             print(" ERRORES DEL FORMULARIO:", form.errors.as_data())
