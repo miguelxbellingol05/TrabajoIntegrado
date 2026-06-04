@@ -1,6 +1,10 @@
 {% extends "reciclaje/vistavend.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
+
+
 <div class="row justify-content-center">
     <div class="col-12 col-md-6 pt-2">
         
@@ -14,32 +18,33 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="bg-light p-3 rounded-3 mb-4 border">
-                        <label class="form-label fw-bold text-dark small">RUT del Proveedor *</label>
                         <div class="input-group">
-                            {{ form.rut }}
-
+                        {{ form.rut|as_crispy_field }}
+                        <div id="alertaRut" class="alert alert-danger d-none mt-3 mb-0 text-center small fw-bold shadow-sm" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i> El RUT no es válido. Ingrese correctamente el RUT.
+                        </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark small">Nombre *</label>
-                        {{ form.nombre }}
+                        <label class="form-label fw-bold text-dark small"></label>
+                        {{ form.nombre|as_crispy_field }}
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark small">Apellido *</label>
-                        {{ form.apellido }}
+                        <label class="form-label fw-bold text-dark small"></label>
+                        {{ form.apellido|as_crispy_field }}
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark small">Número Telefónico</label>
+                        <label class="form-label fw-bold text-dark small"></label>
                         <div class="input-group">
-                            <span class="input-group-text bg-white">+56</span>
-                            {{ form.telefono }}
+
+                            {{ form.telefono|as_crispy_field }}
                         </div>
                     </div>
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark small">Correo Electrónico (Opcional)</label>
-                        {{ form.email }}
+                        {{ form.email|as_crispy_field }}
                     </div>
 
                     <div class="d-grid">
@@ -139,12 +144,55 @@
     let requiereFotoGlobal = false;
     let metalesAgregados = [];
 
+    function validarRutJS(rut) {
+        let valor = rut.replace(/\./g, '').replace(/\-/g, '').trim().toUpperCase();
+
+        if (valor.length < 2) return false;
+
+        let cuerpo = valor.slice(0, -1);
+        let dv = valor.slice(-1);
+
+        let suma = 0;
+        let multiplo = 2;
+
+        for (let i = 1; i <= cuerpo.length; i++) {
+            let index = multiplo * valor.charAt(cuerpo.length - i);
+            suma = suma + index;
+            if (multiplo < 7) { 
+                multiplo = multiplo + 1; 
+            } else { 
+                multiplo = 2; 
+            }
+        }
+
+        let dvEsperado = 11 - (suma % 11);
+
+        dvEsperado = (dvEsperado === 11) ? 0 : ((dvEsperado === 10) ? "K" : dvEsperado);
+
+        return dvEsperado.toString() === dv;
+    }
+
     function avanzarAPesaje() {
-        const rut = document.getElementById('id_rut').value;
+        const rutInput = document.getElementById('id_rut');
+        const rut = rutInput.value;
+        const alertaRut = document.getElementById('alertaRut'); 
+
+        alertaRut.classList.add('d-none');
+
         if (!rut) {
-            alert("Por favor, ingresa el RUT del proveedor primero.");
+            alertaRut.innerHTML = "Por favor, ingresa el RUT del proveedor primero.";
+            alertaRut.classList.remove('d-none'); 
+            rutInput.focus();
             return;
         }
+
+        if (!validarRutJS(rut)) {
+            alertaRut.innerHTML = "El RUT no es válido. Ingrese correctamente el RUT.";
+            alertaRut.classList.remove('d-none');
+            rutInput.focus();
+            return;
+        }
+
         document.getElementById('tarjetaProveedor').classList.add('d-none');
         document.getElementById('tarjetaMetales').classList.remove('d-none');
         window.scrollTo(0, 0);

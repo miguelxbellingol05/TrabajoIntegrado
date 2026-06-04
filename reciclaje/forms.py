@@ -1,11 +1,14 @@
 from django import forms
 from .models import Proveedor
+from .validacion import validar_rut
 
 class ProveedorForm(forms.ModelForm):
+
     class Meta:
         model = Proveedor
         fields = ['rut', 'nombre', 'apellido', 'telefono', 'email']
         
+        # LOS WIDGETS DEBEN IR AQUÍ ADENTRO DE LA CLASE META
         widgets = {
             'rut': forms.TextInput(attrs={
                 'class': 'form-control form-control-lg text-uppercase', 
@@ -31,13 +34,19 @@ class ProveedorForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['rut'].required = True
+        self.fields['nombre'].required = True
+        self.fields['apellido'].required = True
+
     def clean_rut(self):
-        rut = self.cleaned_data.get('rut')
+        rut = self.cleaned_data.get("rut")
+
+        if rut:
+            validar_rut(rut)
+            rut = rut.replace(".", "").replace("-", "").upper()
+            return rut
+
         return rut
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if 'rut' in self._errors:
-            del self._errors['rut']
-        return cleaned_data

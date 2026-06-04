@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, ReadOnlyPasswordHashField
 from reciclaje.models import Usuario, Rol
 from django.contrib.auth.forms import UserChangeForm 
+from reciclaje.validacion import validar_rut
 
 class RegistrarEmpleado(UserCreationForm):
     nombre = forms.CharField(max_length=100)
@@ -16,6 +17,13 @@ class RegistrarEmpleado(UserCreationForm):
         fields = ['username', 'nombre','apellido', 'rol','telefono','correo']
         labels = {'username': 'RUT'}
 
+    def clean_username(self):
+        rut = self.cleaned_data['username']
+
+        validar_rut(rut)
+
+        return rut.replace(".", "").upper()
+    
     def save(self, commit=True):
 
         user = super().save(commit=False)
@@ -36,13 +44,19 @@ class RegistrarEmpleado(UserCreationForm):
             )
         return user
 
-    
+
 class RutLoginForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['username'].label = "RUT"
+    def clean_username(self):
+        rut = self.cleaned_data['username']
+    
+        validar_rut(rut)
+    
+        return rut.replace(".", "").upper()
 
 
 class EditarEmpleadoForm(forms.ModelForm):

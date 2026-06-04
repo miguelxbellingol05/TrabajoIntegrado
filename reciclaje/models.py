@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .validacion import validar_rut
 
 class Rol(models.Model):
     nombre_rol = models.CharField(max_length=50)
@@ -26,6 +27,13 @@ class Usuario(models.Model):
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
+    def clean_rut(self):
+        rut = self.cleaned_data["rut"]
+
+        validar_rut(rut)
+
+        return rut.replace(".", "").upper()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -42,7 +50,12 @@ class Proveedor(models.Model):
     email = models.CharField(max_length=100, null=True, blank=True)
     activo = models.BooleanField(default=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    def clean_rut(self):
+        rut = self.cleaned_data["rut"]
 
+        validar_rut(rut)
+
+        return rut.replace(".", "").upper()
     class Meta:
         db_table = 'PROVEEDOR'
         verbose_name = 'Proveedor'

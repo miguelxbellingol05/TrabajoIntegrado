@@ -25,7 +25,7 @@ def login_user(request):
 def redirect_by_role(user):
     """Auxiliar para redirigir según el rol en la tabla Usuario o si es Staff"""
     if user.is_staff:
-        return redirect('vistadm') 
+        return redirect('adm_home') 
     try:
         perfil = Usuario.objects.get(user=user)
         
@@ -56,7 +56,7 @@ def create_user(request):
         if form.is_valid():
             user = form.save()
             messages.success(request, "Cuenta creada con exito")
-            return redirect('vistadm')
+            return redirect('vistaepds')
     else:
         form = RegistrarEmpleado()
         
